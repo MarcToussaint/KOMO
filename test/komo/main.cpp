@@ -35,7 +35,7 @@ void TEST(Align){
   komo.setPathOpt(1., 100, 5.);
 
   komo.setPosition(1., 1., "endeff", "target");
-  komo.setOrientation(1., 1., "endeff", "target", OT_sumOfSqr);
+  komo.setOrientation(1., 1., "endeff", "target", OT_eq);
   komo.setSlowAround(1., .02);
   komo.setCollisions(true);
 
@@ -65,9 +65,9 @@ void TEST(PR2){
   KOMO komo;
   komo.setModel(K);
   komo.setPathOpt(1., 100, 10.);
-  komo.setPosition(1., 1., "endeff", "target", OT_sumOfSqr);
+  komo.setPosition(1., 1., "endeff", "target");
   komo.setSlowAround(1., .02);
-  komo.setCollisions(true);
+  komo.setCollisions(false);
 
   komo.reset();
 //  komo.setSpline(10);
