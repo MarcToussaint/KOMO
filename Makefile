@@ -11,11 +11,12 @@ initSubmodules: force
 	git submodule update
 	cp config.mk rai/build/config.mk
 
-initUbuntuPackages:
-	make initUbuntuPackages -C $(BASE)
+initUbuntuPackages: $(DEPEND:%=initUbuntuPackages/%)
 
 clean: $(DEPEND:%=cleanPath/%) $(test_paths:%=cleanPath/%)$
 
 runTests: $(test_paths:%=makePath/%) $(test_paths:%=runPath/%)
 
 include $(BASE)/build/generic.mk
+
+.NOTPARALLEL:
