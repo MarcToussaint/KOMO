@@ -1,6 +1,6 @@
 BASE = rai
 
-DEPEND = KOMO Core Geo Kin Gui Optim
+DEPEND = KOMO Core Algo Geo Kin Gui Optim
 
 test_paths = $(shell find test -maxdepth 3 -name 'Makefile' -printf "%h ")
 
