@@ -8,8 +8,7 @@ This is a container repo, exposing the KOMO algorithm of the RAI code. See https
 git clone git@github.com:MarcToussaint/KOMO.git
 cd KOMO
 git submodule init
-git submodule update --remote --merge
-git submodule foreach git pull origin master
+git submodule update
 
 make -j1 initUbuntuPackages  # calls sudo apt-get install; you can always interrupt
 make                         # builds libs and tests
