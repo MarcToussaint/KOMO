@@ -7,6 +7,11 @@ This is a container repo, exposing the KOMO algorithm of the RAI code. See https
 ```
 git clone git@github.com:MarcToussaint/KOMO.git
 cd KOMO
+
+# if you don't have a github account: (switch submodules to public url)
+git config --file=.gitmodules submodule.rai.url https://github.com/MarcToussaint/rai.git
+git config --file=.gitmodules submodule.rai-robotModels.url https://github.com/MarcToussaint/rai-robotModels.git
+
 git submodule init
 git submodule update
 
