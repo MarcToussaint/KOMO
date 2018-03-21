@@ -6,7 +6,7 @@
 //===========================================================================
 
 void TEST(Easy){
-  mlr::KinematicWorld K("arm.g");
+  rai::KinematicWorld K("arm.g");
   cout <<"configuration space dim=" <<K.q.N <<endl;
   KOMO komo;
   komo.setModel(K);
@@ -28,7 +28,7 @@ void TEST(Easy){
 //===========================================================================
 
 void TEST(Align){
-  mlr::KinematicWorld K("arm.g");
+  rai::KinematicWorld K("arm.g");
   cout <<"configuration space dim=" <<K.q.N <<endl;
   KOMO komo;
   komo.setModel(K);
@@ -50,14 +50,14 @@ void TEST(Align){
 
 void TEST(PR2){
   //NOTE: this uses a 25-DOF whole-body-motion model of thbe PR2
-  mlr::KinematicWorld K("model.g");
+  rai::KinematicWorld K("model.g");
   K.optimizeTree();
   makeConvexHulls(K.frames);
   K.calc_fwdPropagateFrames();
   cout <<"configuration space dim=" <<K.q.N <<endl;
-  double rand = mlr::getParameter<double>("KOMO/moveTo/randomizeInitialPose", .0);
+  double rand = rai::getParameter<double>("KOMO/moveTo/randomizeInitialPose", .0);
   if(rand){
-    rnd.seed(mlr::getParameter<uint>("rndSeed", 0));
+    rnd.seed(rai::getParameter<uint>("rndSeed", 0));
     rndGauss(K.q,rand,true);
     K.setJointState(K.q);
   }
@@ -80,7 +80,7 @@ void TEST(PR2){
 //===========================================================================
 
 void TEST(FinalPosePR2){
-  mlr::KinematicWorld K("model.g");
+  rai::KinematicWorld K("model.g");
   K.optimizeTree();
   makeConvexHulls(K.frames);
   cout <<"configuration space dim=" <<K.q.N <<endl;
@@ -92,7 +92,7 @@ void TEST(FinalPosePR2){
 //===========================================================================
 
 int main(int argc,char** argv){
-  mlr::initCmdLine(argc,argv);
+  rai::initCmdLine(argc,argv);
 
   testEasy();
   testAlign();
