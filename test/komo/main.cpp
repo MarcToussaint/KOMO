@@ -12,7 +12,7 @@ void TEST(Easy){
   komo.setModel(K);
   komo.setPathOpt(1., 100, 5.);
 
-  komo.setPosition(1., 1., "endeff", "target", OT_sumOfSqr);
+  komo.setPosition(1., 1., "endeff", "target", OT_sos);
   komo.setSlowAround(1., .02);
   komo.setCollisions(false);
 
