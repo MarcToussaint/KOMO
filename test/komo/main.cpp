@@ -1,92 +1,82 @@
-#include <Kin/kin.h>
-#include <Kin/frame.h>
-#include <Gui/opengl.h>
 #include <KOMO/komo.h>
 
 //===========================================================================
 
 void TEST(Easy){
-  rai::KinematicWorld K("arm.g");
-  cout <<"configuration space dim=" <<K.q.N <<endl;
+  rai::Configuration C("arm.g");
+  cout <<"configuration space dim=" <<C.getJointSpaceDimension() <<endl;
   KOMO komo;
-  komo.setModel(K);
+  komo.setModel(C);
   komo.setPathOpt(1., 100, 5.);
+  komo.setSquaredQAccVelHoming();
 
-  komo.setPosition(1., 1., "endeff", "target", OT_sos);
-  komo.setSlowAround(1., .02);
-  komo.setCollisions(false);
+  komo.addObjective({1.}, FS_positionDiff, {"endeff", "target"}, OT_sos, {1e1});
+  komo.addObjective({.98,1.}, FS_qItself, {}, OT_sos, {1e1}, {}, 1);
+  komo.addObjective({}, FS_accumulatedCollisions, {}, OT_eq, {1.});
+
+  komo.reportProblem();
 
   komo.reset();
 //  komo.setSpline(5);
   komo.run();
-//  komo.checkGradients();
+  cout <<"TIME OPTIM: total=" <<sum(komo.getPath_times()) <<komo.getPath_times() <<endl;
   komo.plotTrajectory();
-  komo.getReport(true);
+//  komo.reportProxies();
+//  komo.checkGradients();
   for(uint i=0;i<2;i++) komo.displayTrajectory();
 }
 
 //===========================================================================
 
 void TEST(Align){
-  rai::KinematicWorld K("arm.g");
-  cout <<"configuration space dim=" <<K.q.N <<endl;
+  rai::Configuration C("arm.g");
+  cout <<"configuration space dim=" <<C.getJointStateDimension() <<endl;
   KOMO komo;
-  komo.setModel(K);
+  komo.setModel(C);
   komo.setPathOpt(1., 100, 5.);
+  komo.setSquaredQAccVelHoming();
 
-  komo.setPosition(1., 1., "endeff", "target");
-  komo.setOrientation(1., 1., "endeff", "target", OT_eq);
-  komo.setSlowAround(1., .02);
-  komo.setCollisions(true);
+  komo.addObjective({1.}, FS_positionDiff, {"endeff", "target"}, OT_eq, {1e1});
+  komo.addObjective({1.}, FS_quaternionDiff, {"endeff", "target"}, OT_eq, {1e1});
+  komo.addObjective({.98,1.}, FS_qItself, {}, OT_sos, {1e1}, {}, 1);
+  komo.addObjective({}, FS_accumulatedCollisions, {}, OT_eq, {1.});
 
   komo.reset();
   komo.run();
   komo.plotTrajectory();
-  komo.getReport(true);
   for(uint i=0;i<2;i++) komo.displayTrajectory();
 }
 
 //===========================================================================
 
 void TEST(PR2){
-  //NOTE: this uses a 25-DOF whole-body-motion model of thbe PR2
-  rai::KinematicWorld K("model.g");
-  K.optimizeTree();
-  makeConvexHulls(K.frames);
-  K.calc_fwdPropagateFrames();
-  cout <<"configuration space dim=" <<K.q.N <<endl;
+  rai::Configuration C("model.g");
+  C.optimizeTree(true);
+  cout <<"configuration space dim=" <<C.getJointStateDimension() <<endl;
   double rand = rai::getParameter<double>("KOMO/moveTo/randomizeInitialPose", .0);
   if(rand){
     rnd.seed(rai::getParameter<uint>("rndSeed", 0));
-    rndGauss(K.q,rand,true);
-    K.setJointState(K.q);
+    rndGauss(C.q,rand,true);
+    C.setJointState(C.q);
   }
 
   KOMO komo;
-  komo.setModel(K);
+  komo.logFile = new ofstream("z.dat");
+//  komo.denseOptimization=true;
+  komo.sparseOptimization=true;
+  komo.setModel(C);
   komo.setPathOpt(1., 100, 10.);
-  komo.setPosition(1., 1., "endeff", "target");
-  komo.setSlowAround(1., .02);
-  komo.setCollisions(false);
+  komo.setSquaredQAccVelHoming();
+  komo.addObjective({1.}, FS_positionDiff, {"endeff", "target"}, OT_eq, {1e1});
+  komo.addObjective({.98,1.}, FS_qItself, {}, OT_sos, {1e1}, {}, 1);
+  komo.addObjective({}, FS_accumulatedCollisions, {}, OT_eq, {1.});
 
   komo.reset();
 //  komo.setSpline(10);
   komo.run();
   komo.plotTrajectory();
-  komo.getReport(true);
+//  komo.checkGradients();
   for(uint i=0;i<2;i++) komo.displayTrajectory();
-}
-
-//===========================================================================
-
-void TEST(FinalPosePR2){
-  rai::KinematicWorld K("model.g");
-  K.optimizeTree();
-  makeConvexHulls(K.frames);
-  cout <<"configuration space dim=" <<K.q.N <<endl;
-  arr x = finalPoseTo(K, *K.getFrameByName("endeff"), *K.getFrameByName("target"));
-  K.setJointState(x.reshape(x.N));
-  K.gl().watch();
 }
 
 //===========================================================================
@@ -94,11 +84,12 @@ void TEST(FinalPosePR2){
 int main(int argc,char** argv){
   rai::initCmdLine(argc,argv);
 
+//  rnd.clockSeed();
+
   testEasy();
   testAlign();
   testPR2();
 
   return 0;
 }
-
 

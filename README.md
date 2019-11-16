@@ -15,7 +15,7 @@ git config --file=.gitmodules submodule.rai-robotModels.url https://github.com/M
 git submodule init
 git submodule update
 
-make -j1 initUbuntuPackages  # calls sudo apt-get install; you can always interrupt
+make -j1 installUbuntuAll  # calls sudo apt-get install; you can always interrupt
 make                         # builds libs and tests
 make runTests
 ```
